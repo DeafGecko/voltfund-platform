@@ -12,9 +12,13 @@ import Layout from "../layouts/Layout.astro";
                   </div>
                   <ul class="nav-links">
                         <li><a href="/">Overview</a></li>
-                        <li><a href="#">Allocations</a></li>
-                        <li><a href="#">Audit Logs</a></li>
-                        <li><a href="#" aria-current="page" class="active">Settings</a>
+                        <li><a href="/allocations">Allocations</a></li>
+                        </li>
+                        <li><a href="/audit-logs">Audit Logs</a></li>
+                        <li>
+                              <a href="#" aria-current="page" class="active"
+                                    >Settings</a
+                              >
                         </li>
                   </ul>
             </nav>
@@ -337,6 +341,12 @@ import Layout from "../layouts/Layout.astro";
             opacity: 1;
             transform: scale(1) translateX(0);
       }
+      .nav-links li.soon a {
+            position: relative;
+            pointer-events: none;
+            color: var(--text-muted);
+            opacity: 0.4;
+      }
 
       /* Workspace core geometry boundaries */
       .workspace {
@@ -467,6 +477,24 @@ import Layout from "../layouts/Layout.astro";
             border-color: var(--accent-glow);
             outline: none;
       }
+
+      .primary-btn.save-btn {
+            background-color: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+                  background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .primary-btn.save-btn:hover {
+            background-color: #ff6b4a;
+            box-shadow: 0 4px 15px rgba(255, 107, 74, 0.3);
+      }     
 
       /* THEME SWITCH PILL CONTAINER ENGINEERING */
       .toggle-container {

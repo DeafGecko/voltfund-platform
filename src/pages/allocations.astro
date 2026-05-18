@@ -1,0 +1,175 @@
+---
+// src/pages/allocations.astro - VoltFund Deep-Dive Allocations Management
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="VoltFund | Capital Allocation Streams">
+      <div class="dashboard-layout">
+            <nav class="sidebar" aria-label="Main Navigation">
+                  <div class="logo">
+                        <span class="logo-dot" aria-hidden="true"></span>
+                        <h1>VoltFund</h1>
+                  </div>
+                  <ul class="nav-links">
+                        <li><a href="/">Overview</a></li>
+                        <li>
+                              <a href="#" aria-current="page" class="active"
+                                    >Allocations</a>
+                        </li>
+                        <li><a href="/audit-logs">Audit Logs</a></li>
+                        <li><a href="/settings">Settings</a></li>
+                  </ul>
+            </nav>
+
+            <main id="main-content" class="workspace">
+                  <header class="workspace-header">
+                        <div>
+                              <h2>Capital Allocation Streams</h2>
+                              <p class="subtitle">
+                                    Detailed sub-budget thresholds and funding
+                                    distribution channels
+                              </p>
+                        </div>
+                        <div class="user-profile" aria-label="User Profile">
+                              DR
+                        </div>
+                  </header>
+
+                  <div class="metrics-grid">
+                        <section class="card">
+                              <h3 class="card-label">
+                                    Allocation Streams Coming Soon
+                              </h3>
+                              <p
+                                    class="channel-desc"
+                                    style="color: var(--text-muted);"
+                              >
+                                    Ready to wire up your deep-dive budget
+                                    management matrix loops.
+                              </p>
+                        </section>
+                  </div>
+            </main>
+      </div>
+</Layout>
+
+<style>
+      /* Keeps your premium layout grids perfectly aligned with the main dashboard */
+      .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-main);
+            overflow-x: hidden;
+      }
+      .sidebar {
+            width: 260px;
+            background-color: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+      }
+      .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+      }
+      .logo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+      }
+      .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+      }
+      .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+      }
+      .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 15px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid transparent;
+      }
+      .nav-links a:hover {
+            color: var(--text-primary);
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+      }
+      .nav-links a.active {
+            color: var(--text-primary);
+            background-color: var(--bg-surface-elevated);
+            border-color: rgba(255, 78, 58, 0.15);
+            font-weight: 600;
+      }
+      .workspace {
+            flex: 1;
+            padding: 40px 48px;
+            background-color: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+      }
+      .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+      }
+      .workspace-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+      }
+      .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+      }
+      .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-surface-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+      }
+      .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+      }
+      .card-label {
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-weight: 600;
+      }
+</style>

@@ -69,8 +69,8 @@ const auditLogs = [
       </div>
       <ul class="nav-links">
         <li><a href="#" aria-current="page" class="active">Overview</a></li>
-        <li><a href="#">Allocations<h6>(coming soon)</h6></a></li>
-        <li><a href="#">Audit Logs<h6>(coming soon)</h6></a></li>
+        <li><a href="/allocations">Allocations</a></li>
+        <li><a href="/audit-logs">Audit Logs</a></li>
         <li><a href="/settings">Settings</a></li>
       </ul>
     </nav>
@@ -87,7 +87,12 @@ const auditLogs = [
       </header>
 
       <div class="metrics-grid">
-        <section class="card total-pool" aria-labelledby="pool-title">
+        <section
+          class="card total-pool"
+          aria-labelledby="pool-title"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <h3 id="pool-title" class="card-label">Total Liquid Capital</h3>
           <div id="total-pool-balance" class="main-balance">$14,640.00</div>
           <p class="balance-subtext">Active operational reserves</p>
@@ -123,7 +128,12 @@ const auditLogs = [
         <div class="channels-grid">
           {
             microFunds.map((fund) => (
-              <article class="channel-card" key={fund.id}>
+              <article
+                class="channel-card"
+                key={fund.id}
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 <div class="channel-header">
                   <div class="channel-icon-wrapper">
                     <i data-lucide={fund.icon} class="channel-icon-graphic" />
@@ -152,21 +162,39 @@ const auditLogs = [
         <section class="card chart-card" aria-labelledby="chart-title">
           <h3 id="chart-title" class="card-label">Weekly Velocity Stream</h3>
           <div
+            id="weekly-chart-container"
             class="bar-chart-container"
             aria-label="Bar chart showing micro-grants distributed this week."
+            aria-live="polite"
+            aria-atomic="true"
           >
-            <div class="chart-bar-wrapper">
-              <span class="bar-value">$1.2k</span>
+            <div
+              class="chart-bar-wrapper"
+              aria-label="Monday allocation total: 1,200 dollars"
+            >
+              <span class="bar-value" aria-hidden="true">$1.2k</span>
               <div class="chart-bar" style="height: 40%;"></div>
               <span class="bar-day" aria-hidden="true">Mon</span>
             </div>
-            <div class="chart-bar-wrapper">
-              <span class="bar-value">$800</span>
+            <div
+              class="chart-bar-wrapper"
+              aria-label="Tuesday allocation total: 800 dollars"
+            >
+              <span class="bar-value" aria-hidden="true">$800</span>
               <div class="chart-bar" style="height: 25%;"></div>
               <span class="bar-day" aria-hidden="true">Tue</span>
             </div>
-            <div class="chart-bar-wrapper">
-              <span id="active-velocity-label" class="bar-value">$3.4k</span>
+
+            <div
+              id="active-wednesday-wrapper"
+              class="chart-bar-wrapper"
+              aria-label="Wednesday allocation total: 3,400 dollars"
+            >
+              <span
+                id="active-velocity-label"
+                class="bar-value"
+                aria-hidden="true">$3.4k</span
+              >
               <div
                 id="active-velocity-bar"
                 class="chart-bar active-bar"
@@ -175,13 +203,20 @@ const auditLogs = [
               </div>
               <span class="bar-day" aria-hidden="true">Wed</span>
             </div>
-            <div class="chart-bar-wrapper">
-              <span class="bar-value">$1.5k</span>
+
+            <div
+              class="chart-bar-wrapper"
+              aria-label="Thursday allocation total: 1,500 dollars"
+            >
+              <span class="bar-value" aria-hidden="true">$1.5k</span>
               <div class="chart-bar" style="height: 50%;"></div>
               <span class="bar-day" aria-hidden="true">Thu</span>
             </div>
-            <div class="chart-bar-wrapper">
-              <span class="bar-value">$2.9k</span>
+            <div
+              class="chart-bar-wrapper"
+              aria-label="Friday allocation total: 2,900 dollars"
+            >
+              <span class="bar-value" aria-hidden="true">$2.9k</span>
               <div class="chart-bar" style="height: 80%;"></div>
               <span class="bar-day" aria-hidden="true">Fri</span>
             </div>
@@ -190,7 +225,12 @@ const auditLogs = [
 
         <section class="card logs-card" aria-labelledby="logs-title">
           <h3 id="logs-title" class="card-label">Live Audit Trail</h3>
-          <ul id="log-feed-list" class="log-feed" role="list">
+          <ul
+            id="log-feed-list"
+            class="log-feed"
+            role="list"
+            aria-live="polite"
+          >
             {
               auditLogs.map((log) => (
                 <li class="log-item" key={log.id}>
@@ -272,7 +312,6 @@ const auditLogs = [
 
   <script>
     declare const lucide: any;
-
     if (typeof lucide !== "undefined") {
       lucide.createIcons();
     }
@@ -306,7 +345,9 @@ const auditLogs = [
 
     let currentStreamName = "Selected Channel";
 
-    // STRICTOR VALIDATION ENGINE RE-IMPLEMENTED
+    // Initialized base total including our baseline visual state ($3,400)
+    let wednesdayTotalVelocity = 3400;
+
     const validateAndSanitizeInput = (rawValue: string): number | null => {
       const cleanString = rawValue.trim().replace(/[$,]/g, "");
 
@@ -315,7 +356,6 @@ const auditLogs = [
         return null;
       }
 
-      // Using Number() evaluates the full string block instead of cutting off early
       const parsedAmount = Number(cleanString);
 
       if (isNaN(parsedAmount)) {
@@ -361,25 +401,44 @@ const auditLogs = [
 
       const activeBar = document.getElementById("active-velocity-bar");
       const activeLabel = document.getElementById("active-velocity-label");
+      const wednesdayWrapper = document.getElementById(
+        "active-wednesday-wrapper",
+      );
 
-      if (activeBar) {
+      if (activeBar || activeLabel || wednesdayWrapper) {
+        wednesdayTotalVelocity += amount;
+
         const maxVelocityCeiling = 10000;
-        let heightPercentage = (amount / maxVelocityCeiling) * 100;
+        let heightPercentage =
+          (wednesdayTotalVelocity / maxVelocityCeiling) * 100;
 
-        if (heightPercentage < 15) heightPercentage = 15;
-        if (heightPercentage > 100) heightPercentage = 100;
+        let adaptiveHeight = Math.max(heightPercentage, 8);
+        if (adaptiveHeight > 100) adaptiveHeight = 100;
 
-        activeBar.style.height = `${heightPercentage}%`;
-      }
+        if (activeBar) {
+          activeBar.style.height = `${adaptiveHeight}%`;
+        }
 
-      if (activeLabel) {
-        const metricValue = (amount / 1000).toFixed(1);
-        activeLabel.textContent = `$${metricValue}k`;
+        if (activeLabel) {
+          if (wednesdayTotalVelocity < 100) {
+            activeLabel.textContent = `$${wednesdayTotalVelocity.toFixed(0)}`;
+          } else {
+            const metricValue = (wednesdayTotalVelocity / 1000).toFixed(1);
+            activeLabel.textContent = `$${metricValue}k`;
+          }
+        }
+
+        // UPGRADED ACCESSIBILITY SPEECH LAYER GENERATOR
+        if (wednesdayWrapper) {
+          wednesdayWrapper.setAttribute(
+            "aria-label",
+            `Wednesday allocation total: ${wednesdayTotalVelocity.toLocaleString("en-US", { maximumFractionDigits: 0 })} dollars`,
+          );
+        }
       }
 
       if (logFeedList) {
         const formattedAmount = `-$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
         const newLogItem = document.createElement("li");
         newLogItem.className = "log-item";
 
@@ -393,7 +452,6 @@ const auditLogs = [
           </div>
           <span class="log-amount" aria-label="Amount subtracted: ${formattedAmount.replace("-", "")}">${formattedAmount}</span>
         `;
-
         logFeedList.insertBefore(newLogItem, logFeedList.firstChild);
       }
     };
@@ -408,17 +466,21 @@ const auditLogs = [
       });
     });
 
-    const closeModal = () => {
+    const clearFormAndState = () => {
       if (modalForm) modalForm.reset();
-      modal.close();
     };
+
     closeBtn?.addEventListener("click", (e) => {
       e.preventDefault();
-      closeModal();
+      modal.close();
     });
     cancelBtn?.addEventListener("click", (e) => {
       e.preventDefault();
-      closeModal();
+      modal.close();
+    });
+
+    modal?.addEventListener("close", () => {
+      clearFormAndState();
     });
 
     modalForm?.addEventListener("submit", function (event) {
@@ -432,7 +494,7 @@ const auditLogs = [
         modalNotesInput.value.trim() || "Micro-grant distribution verified";
 
       executeDeductionEngine(validatedAmount, currentStreamName, auditNotes);
-      closeModal();
+      modal.close();
     });
 
     quickGrantForm?.addEventListener("submit", function (event) {
@@ -467,7 +529,7 @@ const auditLogs = [
   .sidebar {
     width: 260px;
     background-color: var(--bg-main);
-    border-right: 1px solid var(--bg-surface);
+    border-right: 1px solid var(--border-color);
     padding: 40px 24px;
     display: flex;
     flex-direction: column;
@@ -521,7 +583,7 @@ const auditLogs = [
   .nav-links a:hover {
     color: var(--text-primary);
     background-color: var(--bg-surface);
-    border-color: rgba(255, 255, 255, 0.03);
+    border-color: var(--border-color);
   }
   .nav-links a.active {
     color: var(--text-primary);
@@ -596,7 +658,7 @@ const auditLogs = [
 
   .card {
     background-color: var(--bg-surface);
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 32px;
   }
@@ -695,7 +757,7 @@ const auditLogs = [
 
   .channel-card {
     background-color: var(--bg-surface);
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 24px;
     display: flex;
@@ -797,7 +859,9 @@ const auditLogs = [
     background-color: var(--bg-surface-elevated);
     border-radius: 4px;
     min-height: 8px;
-    transition: background-color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .chart-bar.active-bar,
   .chart-bar:hover {
