@@ -1,0 +1,539 @@
+---
+// src/pages/settings.astro - VoltFund Control & Settings Console
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="VoltFund | Settings Console">
+      <div class="dashboard-layout">
+            <nav class="sidebar" aria-label="Main Navigation">
+                  <div class="logo">
+                        <span class="logo-dot" aria-hidden="true"></span>
+                        <h1>VoltFund</h1>
+                  </div>
+                  <ul class="nav-links">
+                        <li><a href="/">Overview</a></li>
+                        <li><a href="#">Allocations</a></li>
+                        <li><a href="#">Audit Logs</a></li>
+                        <li><a href="#" aria-current="page" class="active">Settings</a>
+                        </li>
+                  </ul>
+            </nav>
+
+            <main id="main-content" class="workspace">
+                  <header class="workspace-header">
+                        <div>
+                              <h2>System Settings</h2>
+                              <p class="subtitle">
+                                    Configure operational preferences and
+                                    terminal properties
+                              </p>
+                        </div>
+                        <div
+                              id="header-profile-badge"
+                              class="user-profile"
+                              aria-label="User Profile"
+                        >
+                              DR
+                        </div>
+                  </header>
+
+                  <div class="settings-stack">
+                        <section
+                              class="card settings-card"
+                              aria-labelledby="profile-heading"
+                        >
+                              <div class="card-header-group">
+                                    <i data-lucide="user" class="settings-icon"
+                                    ></i>
+                                    <h3 id="profile-heading" class="card-title">
+                                          Operator Profile
+                                    </h3>
+                              </div>
+                              <p class="card-desc">
+                                    Modify identity configurations displayed
+                                    across terminal headers and audit
+                                    verification fields.
+                              </p>
+
+                              <form
+                                    id="profile-settings-form"
+                                    class="settings-form"
+                              >
+                                    <div class="input-wrapper">
+                                          <label for="operator-name"
+                                                >Full Identity Signature</label
+                                          >
+                                          <div class="form-input-group">
+                                                <input
+                                                      type="text"
+                                                      id="operator-name"
+                                                      value="Dwight Rogers"
+                                                      placeholder="Enter full name..."
+                                                      aria-required="true"
+                                                />
+                                          </div>
+                                    </div>
+                                    <button
+                                          type="submit"
+                                          class="primary-btn save-btn"
+                                          >Update Profile Signature</button
+                                    >
+                              </form>
+                        </section>
+
+                        <section
+                              class="card settings-card"
+                              aria-labelledby="theme-heading"
+                        >
+                              <div class="card-header-group">
+                                    <i
+                                          data-lucide="palette"
+                                          class="settings-icon"></i>
+                                    <h3 id="theme-heading" class="card-title">
+                                          Interface Mode
+                                    </h3>
+                              </div>
+                              <p class="card-desc">
+                                    Toggle the visual layer threshold. Dark mode
+                                    optimizes energy consumption; Light mode
+                                    prioritizes outdoor readability.
+                              </p>
+
+                              <div class="toggle-container">
+                                    <span class="toggle-label"
+                                          >Active Environment Mode</span
+                                    >
+                                    <button
+                                          id="theme-toggle-btn"
+                                          class="theme-toggle-action"
+                                          aria-label="Toggle visual theme preference"
+                                    >
+                                          <div class="toggle-indicator"></div>
+                                          <span
+                                                id="theme-status-text"
+                                                class="toggle-status-label"
+                                                >Dark Mode</span
+                                          >
+                                    </button>
+                              </div>
+                        </section>
+                  </div>
+            </main>
+      </div>
+
+      <script>
+            declare const lucide: any;
+
+            if (typeof lucide !== "undefined") {
+                  lucide.createIcons();
+            }
+
+            const profileForm = document.getElementById(
+                  "profile-settings-form",
+            ) as HTMLFormElement;
+            const nameInput = document.getElementById(
+                  "operator-name",
+            ) as HTMLInputElement;
+            const profileBadge = document.getElementById(
+                  "header-profile-badge",
+            );
+            const themeBtn = document.getElementById("theme-toggle-btn");
+            const themeText = document.getElementById("theme-status-text");
+
+            // --- Profile Identity Configuration Loop ---
+            const savedName =
+                  localStorage.getItem("vtf_operator_name") || "Dwight Rogers";
+            if (nameInput) nameInput.value = savedName;
+
+            const updateAvatarBadge = (fullName: string) => {
+                  if (!profileBadge) return;
+                  const cleanName = fullName.trim();
+                  if (!cleanName) {
+                        profileBadge.textContent = "OP";
+                        return;
+                  }
+                  const parts = cleanName.split(/\s+/);
+                  if (parts.length >= 2) {
+                        profileBadge.textContent = (
+                              parts[0][0] + parts[1][0]
+                        ).toUpperCase();
+                  } else {
+                        profileBadge.textContent = cleanName
+                              .substring(0, 2)
+                              .toUpperCase();
+                  }
+            };
+
+            updateAvatarBadge(savedName);
+
+            profileForm?.addEventListener("submit", (e) => {
+                  e.preventDefault();
+                  const newName = nameInput.value.trim();
+
+                  if (!newName) {
+                        alert(
+                              "Validation Failed: Operator signature cannot be left blank.",
+                        );
+                        return;
+                  }
+
+                  localStorage.setItem("vtf_operator_name", newName);
+                  updateAvatarBadge(newName);
+                  alert(
+                        "Success: Operator identity updated cleanly across workspace caches.",
+                  );
+            });
+
+            // --- Theme Controller Script ---
+            const systemPrefersLight = window.matchMedia(
+                  "(prefers-color-scheme: light)",
+            ).matches;
+            const activeTheme =
+                  localStorage.getItem("vtf_theme") ||
+                  (systemPrefersLight ? "light" : "dark");
+
+            const applyThemeState = (theme: "dark" | "light") => {
+                  if (theme === "light") {
+                        document.documentElement.classList.add("light-theme");
+                        themeBtn?.classList.add("is-light");
+                        if (themeText) themeText.textContent = "Light Mode";
+                  } else {
+                        document.documentElement.classList.remove(
+                              "light-theme",
+                        );
+                        themeBtn?.classList.remove("is-light");
+                        if (themeText) themeText.textContent = "Dark Mode";
+                  }
+                  localStorage.setItem("vtf_theme", theme);
+            };
+
+            applyThemeState(activeTheme as "dark" | "light");
+
+            themeBtn?.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  const isCurrentlyLight =
+                        document.documentElement.classList.contains(
+                              "light-theme",
+                        );
+                  applyThemeState(isCurrentlyLight ? "dark" : "light");
+            });
+      </script>
+</Layout>
+
+<style define:global>
+      :root {
+            --bg-main: #0a0a0a;
+            --bg-surface: #121212;
+            --bg-surface-elevated: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-muted: #a0a0a0;
+            --border-color: rgba(255, 255, 255, 0.03);
+            --input-bg: #0a0a0a;
+            --input-text: #ffffff;
+      }
+
+      /* Target the HTML root node directly when class is injected */
+      html.light-theme {
+            --bg-main: #f4f4f6;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #ededf1;
+            --text-primary: #121214;
+            --text-muted: #6b6b76;
+            --border-color: rgba(0, 0, 0, 0.05);
+            --input-bg: #f4f4f6;
+            --input-text: #121214;
+      }
+
+      /* Base Viewport Bindings */
+      .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.25s ease;
+      }
+
+      /* Sticky Sidebar Layout Core Styles */
+      .sidebar {
+            width: 260px;
+            background-color: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            transition:
+                  background-color 0.25s ease,
+                  border-color 0.25s ease;
+      }
+      .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+      }
+      .logo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+      }
+      .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+      }
+      .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+      }
+      .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 15px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            transition:
+                  color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid transparent;
+      }
+      .nav-links a:hover {
+            color: var(--text-primary);
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+      }
+      .nav-links a.active {
+            color: var(--text-primary);
+            background-color: var(--bg-surface-elevated);
+            border-color: rgba(255, 78, 58, 0.15);
+            font-weight: 600;
+      }
+      .nav-links a::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0) translateX(4px);
+            transition:
+                  opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .nav-links a:hover::after,
+      .nav-links a.active::after {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+      }
+
+      /* Workspace core geometry boundaries */
+      .workspace {
+            flex: 1;
+            padding: 40px 48px;
+            background-color: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            min-height: 100vh;
+            transition: background-color 0.25s ease;
+      }
+      .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+      }
+      .workspace-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+      }
+      .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+      }
+      .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            transition: all 0.25s ease;
+      }
+
+      /* Settings Block Panels Layout Rules */
+      .settings-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 680px;
+      }
+      .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition:
+                  background-color 0.25s ease,
+                  border-color 0.25s ease;
+      }
+      .settings-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+      }
+      .card-header-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+      }
+      .settings-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            stroke-width: 2px;
+      }
+      .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+      }
+      .card-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 8px;
+      }
+
+      /* Identity Input Text Component Sets */
+      .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+            width: 100%;
+      }
+      .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+      }
+      .input-wrapper label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+      }
+      .form-input-group {
+            width: 100%;
+      }
+      .form-input-group input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--bg-surface-elevated);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--input-text);
+            font-size: 15px;
+            font-weight: 500;
+            transition:
+                  border-color 0.2s ease,
+                  background-color 0.25s ease,
+                  color 0.25s ease;
+      }
+      .form-input-group input:focus {
+            border-color: var(--accent-glow);
+            outline: none;
+      }
+
+      /* THEME SWITCH PILL CONTAINER ENGINEERING */
+      .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--input-bg);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--bg-surface-elevated);
+            width: 100%;
+            margin-top: 8px;
+            transition:
+                  background-color 0.25s ease,
+                  border-color 0.25s ease;
+      }
+      .toggle-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+      }
+      .theme-toggle-action {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            width: 140px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition:
+                  background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.25s ease;
+      }
+
+      .toggle-indicator {
+            width: 18px;
+            height: 18px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 78, 58, 0.4);
+            transform: translateX(0px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .toggle-status-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: absolute;
+            right: 16px;
+            transition: color 0.25s ease;
+      }
+
+      /* ANIMATED MODIFIERS FOR THE TOGGLE SWITCH RUNWAY */
+      .theme-toggle-action.is-light {
+            background-color: #ededf1;
+            border-color: rgba(0, 0, 0, 0.08);
+      }
+      .theme-toggle-action.is-light .toggle-indicator {
+            transform: translateX(94px);
+      }
+      .theme-toggle-action.is-light .toggle-status-label {
+            left: 16px;
+            right: auto;
+            color: #121214;
+      }
+</style>
