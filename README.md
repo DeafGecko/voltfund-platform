@@ -1,7 +1,4 @@
 # VoltFund Console 
-
-Hey, I'm Dwight. I've spent over a decade working as a professional graphic designer, and I'm currently transitioning into design engineering and front-end development. This console is my project where I combine human-centered design with clean, functional code.
-
 VoltFund is a real-time micro-grant dashboard for non-profit mutual aid distribution. It lets operators deploy emergency capital instantly into the community while tracking everything through a live audit ledger.
 
 ## Interface Preview
