@@ -1,4 +1,4 @@
-# VoltFund Console ⚡
+# VoltFund Console
 
 A high-velocity, minimalist micro-management dashboard designed for direct non-profit mutual aid distribution and live telemetry tracking. Built with focus on empathy-first visual communication, strict computational reliability, and a clean Swiss-Industrial digital aesthetic.
 
