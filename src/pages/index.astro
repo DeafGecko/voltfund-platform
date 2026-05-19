@@ -437,21 +437,42 @@ const auditLogs = [
         }
       }
 
+      // Clone an existing log row so the new entry inherits Astro's scoped
+      // style hash and renders identically to the server-rendered rows.
       if (logFeedList) {
-        const formattedAmount = `-$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        const newLogItem = document.createElement("li");
-        newLogItem.className = "log-item";
+        const formattedAmount = `-$${amount.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
 
-        newLogItem.innerHTML = `
-          <div class="log-item-left">
-            <div class="log-meta">
-              <span class="log-channel">${channelName}</span>
-              <span class="log-time">Just now</span>
-            </div>
-            <p class="log-note">${notesText}</p>
-          </div>
-          <span class="log-amount" aria-label="Amount subtracted: ${formattedAmount.replace("-", "")}">${formattedAmount}</span>
-        `;
+        const templateItem = logFeedList.querySelector(
+          ".log-item",
+        ) as HTMLLIElement | null;
+
+        let newLogItem: HTMLLIElement;
+        if (templateItem) {
+          newLogItem = templateItem.cloneNode(true) as HTMLLIElement;
+        } else {
+          newLogItem = document.createElement("li");
+          newLogItem.className = "log-item";
+        }
+
+        const channelEl = newLogItem.querySelector(".log-channel");
+        const timeEl = newLogItem.querySelector(".log-time");
+        const noteEl = newLogItem.querySelector(".log-note");
+        const amountEl = newLogItem.querySelector(".log-amount");
+
+        if (channelEl) channelEl.textContent = channelName;
+        if (timeEl) timeEl.textContent = "Just now";
+        if (noteEl) noteEl.textContent = notesText;
+        if (amountEl) {
+          amountEl.textContent = formattedAmount;
+          amountEl.setAttribute(
+            "aria-label",
+            `Amount subtracted: ${formattedAmount.replace("-", "")}`,
+          );
+        }
+
         logFeedList.insertBefore(newLogItem, logFeedList.firstChild);
       }
     };
